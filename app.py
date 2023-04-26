@@ -1,4 +1,4 @@
-from colorama import Cursor
+
 from flask import Flask, request, jsonify
 import json 
 import sqlite3
@@ -67,7 +67,28 @@ def parkingss():
         if parkingss is not None:
             return jsonify(parkingss) 
         else:
-            return"erreur",404      
+            return"erreur",404   
+
+
+@app.route("/parking/alls", methods=["GET","POST"])
+def parkingsss():
+    conn = db_connection()
+    cursor = conn.cursor()
+
+    if request.method == "GET":
+        cursor.execute("SELECT * FROM PARKING_SMART WHERE id IN (SELECT MAX(id) FROM PARKING_SMART GROUP BY slot_id)")
+        
+
+        parkingsss=[
+
+            dict (id=row[0], parking_id=row[1],slot_id=row[2], door_id=row[3], slot_type=row[4], slot_status=row[5], door_status=row[6], created_at=row[7])
+            for row in cursor.fetchall()
+        ]
+
+        if parkingsss is not None:
+            return jsonify(parkingsss) 
+        else:
+            return"erreur",404                  
 
 
 
@@ -95,7 +116,7 @@ def rechercher_parking(id):
 
 
 if __name__=="__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
 
 
 
